@@ -27,6 +27,7 @@ $stem = $block->getFormStem() . "[attachments][{$index}]";
         <?php endif; ?>
         <?php echo $this->formHidden($stem . '[caption]', $attachment->caption); ?>
         <?php echo $this->formHidden($stem . '[order]', $index + 1, array('class' => 'attachment-order')); ?>
+        <?php echo $this->formHidden($stem . '[media_start_from]', $attachment->media_start_from); ?>
     </div>
 
     <span class="edit-attachment" role="button"><?php echo __('Edit'); ?></span>

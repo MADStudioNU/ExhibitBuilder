@@ -109,7 +109,7 @@ class ExhibitBuilder_ExhibitsController extends Omeka_Controller_AbstractActionC
     public function showAction()
     {
         $exhibit = $this->_findByExhibitSlug();
-        
+
         if (!$exhibit) {
             throw new Omeka_Controller_Exception_404;
         }
@@ -425,6 +425,7 @@ class ExhibitBuilder_ExhibitsController extends Omeka_Controller_AbstractActionC
         $attachment->item_id = $this->_getParam('item_id');
         $attachment->file_id = $this->_getParam('file_id');
         $attachment->caption = $this->_getParam('caption');
+        $attachment->media_start_from = $this->_getParam('media_start_from');
 
         $block = new ExhibitPageBlock;
         $block->order = $this->_getParam('block_index');

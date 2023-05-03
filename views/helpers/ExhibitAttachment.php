@@ -16,13 +16,32 @@ class ExhibitBuilder_View_Helper_ExhibitAttachment extends Zend_View_Helper_Abst
      * @param boolean $forceImage Whether to display the attachment as an image
      *  always Defaults to false.
      * @return string
-     */ 
+     */
     public function exhibitAttachment($attachment, $fileOptions = array(), $linkProps = array(), $forceImage = false, $showTitle = false)
     {
         $item = $attachment->getItem();
         $file = $attachment->getFile();
+        $data_description = '';
+
+        if (metadata($item, array('Avalon Video','Avalon Section PURL'))) {
+
+            $url = html_escape(metadata($item, array('Avalon Video','Avalon Section PURL')));
+            $height = metadata($item, array('Avalon Video','Avalon Height')) ? html_escape(metadata($item, array('Avalon Video','Avalon Height'))) : get_option('avalon_height_public');
+            $html = '<iframe src="'. $url .'?urlappend=%2Fembed" width="100%" height="' . $height . '" frameborder=0 webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+
+            echo $html;
+        }
 
         if ($file) {
+            if (!isset($fileOptions['imgAttributes']['alt'])) {
+                $fileOptions['imgAttributes']['alt'] = metadata($item, array('Dublin Core', 'Title'), array('no_escape' => true));
+
+                if (is_string($attachment['caption']) || $attachment['caption'] != '') {
+                    $data_description = strip_tags($attachment['caption']);
+                }
+                $fileOptions['imgAttributes']['data-description'] = $data_description;
+            }
+
             if ($forceImage) {
                 $imageSize = isset($fileOptions['imageSize'])
                     ? $fileOptions['imageSize']

@@ -4,7 +4,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @package ExhibitBuilder
  */
- 
+
 /**
  * Exhibit model.
  *
@@ -32,7 +32,14 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
      * @var string
      */
     public $credits;
-    
+
+    /**
+     * Exhibit curator.
+     *
+     * @var string
+     */
+    public $curator;
+
     /**
      * Whether the exhibit is featured.
      *
@@ -46,7 +53,7 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
      * @var integer
      */
     public $public = 0;
-    
+
     /**
      * Public theme to use for this exhibit.
      *
@@ -60,14 +67,14 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
      * @var string
      */
     public $theme_options;
-    
+
     /**
      * URL slug for the exhibit.
      *
      * @var string
      */
     public $slug;
-    
+
     /**
      * Date the exhibit was created, as a MySQL-formatted date string.
      *
@@ -191,7 +198,7 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
         $this->setSearchTextTitle($this->title);
         $this->addSearchText($this->title);
         $this->addSearchText($this->description);
-        
+
         if ($args['post']) {
             //Add the tags after the form has been saved
             $post = $args['post'];
@@ -226,13 +233,13 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
             if ($parentId == 'null') {
                 $pageData[$pageId] = null;
             }
-            
+
             if (!isset($ordersByParent[$parentId])) {
                 $order = $ordersByParent[$parentId] = 0;
             } else {
                 $order = ++$ordersByParent[$parentId];
             }
-            
+
             $orders[$pageId] = $order;
         }
 
@@ -358,10 +365,10 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
     public function hasItem(Item $item)
     {
         if (!$item->exists()) {
-           throw new InvalidArgumentException("Item does not exist (is not persisted).");
+            throw new InvalidArgumentException("Item does not exist (is not persisted).");
         }
         if (!$this->exists()) {
-           throw new RuntimeException("Cannot call hasItem() on a new (non-persisted) exhibit.");
+            throw new RuntimeException("Cannot call hasItem() on a new (non-persisted) exhibit.");
         }
         return $this->getTable()->exhibitHasItem($this->id, $item->id);
     }
@@ -460,25 +467,25 @@ class Exhibit extends Omeka_Record_AbstractRecord implements Zend_Acl_Resource_I
 
             $select =
                 $fileTable->getSelect()
-                ->joinInner(
-                    array('eba' => $db->ExhibitBlockAttachment),
-                    'eba.file_id = files.id',
-                    array()
-                )
-                ->joinInner(
-                    array('epb' => $db->ExhibitPageBlock),
-                    'epb.id = eba.block_id',
-                    array()
-                )
-                ->joinInner(
-                    array('ep' => $db->ExhibitPage),
-                    'ep.id = epb.page_id',
-                    array()
-                )
-                ->where('ep.exhibit_id = ?', $this->id)
-                ->where('files.has_derivative_image = 1')
-                ->order(array('ep.order', 'ep.parent_id', 'epb.order', 'eba.order'))
-                ->limit(1);
+                    ->joinInner(
+                        array('eba' => $db->ExhibitBlockAttachment),
+                        'eba.file_id = files.id',
+                        array()
+                    )
+                    ->joinInner(
+                        array('epb' => $db->ExhibitPageBlock),
+                        'epb.id = eba.block_id',
+                        array()
+                    )
+                    ->joinInner(
+                        array('ep' => $db->ExhibitPage),
+                        'ep.id = epb.page_id',
+                        array()
+                    )
+                    ->where('ep.exhibit_id = ?', $this->id)
+                    ->where('files.has_derivative_image = 1')
+                    ->order(array('ep.order', 'ep.parent_id', 'epb.order', 'eba.order'))
+                    ->limit(1);
             $file = $fileTable->fetchObject($select);
         }
 

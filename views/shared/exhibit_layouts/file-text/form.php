@@ -17,7 +17,16 @@ $options = $block->getOptions();
         <h4><?php echo __('Layout Options'); ?></h4>
         <div class="drawer-toggle"></div>
     </div>
-    
+
+    <div class="separator">
+        <?php echo $this->formLabel($formStem . '[options][separator]', __('Block separator')); ?>
+        <?php
+        echo $this->formSelect($formStem . '[options][separator]',
+            @$options['separator'], array(),
+            array('yes' => __('Print'), 'no' => __('Don\'t print')));
+        ?>
+    </div>
+
     <div class="file-position">
         <?php echo $this->formLabel($formStem . '[options][file-position]', __('File position')); ?>
         <?php

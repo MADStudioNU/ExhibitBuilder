@@ -15,16 +15,23 @@ function exhibit_builder_render_exhibit_page($exhibitPage = null)
     if ($exhibitPage === null) {
         $exhibitPage = get_current_record('exhibit_page');
     }
-    
+
+    $counter = 0;
     $blocks = $exhibitPage->ExhibitPageBlocks;
+    $blocksCount = count($blocks);
     $rawAttachments = $exhibitPage->getAllAttachments();
     $attachments = array();
     foreach ($rawAttachments as $attachment) {
         $attachments[$attachment->block_id][] = $attachment;
     }
     foreach ($blocks as $index => $block) {
+        $counter++;
         $layout = $block->getLayout();
-        echo '<div class="exhibit-block layout-' . html_escape($layout->id) . '">';
+        $counter++;
+        $options = $block->getOptions();
+        $needSeparator = isset($options['separator']) ? html_escape($options['separator']) : 'yes';
+
+        echo '<div class="exhibit-block layout-' . html_escape($layout->id) . ' separator-' . html_escape($needSeparator) . '">';
         echo get_view()->partial($layout->getViewPartial(), array(
             'index' => $index,
             'options' => $block->getOptions(),
@@ -33,6 +40,9 @@ function exhibit_builder_render_exhibit_page($exhibitPage = null)
             'block' => $block,
         ));
         echo '</div>';
+        if($counter < $blocksCount && $needSeparator == "yes") {
+            echo '<hr class="dotted exhibit-block-separator">';
+        }
     }
 }
 
@@ -159,7 +169,7 @@ function exhibit_builder_link_to_next_page($text = null, $props = array(), $exhi
             $props['class'] = 'next-page';
         }
         if ($text === null) {
-            $text = metadata($targetPage, 'menu_title') . ' &rarr;';
+            $text = metadata($targetPage, 'title');
         }
         return exhibit_builder_link_to_exhibit($exhibit, $text, $props, $targetPage);
     }
@@ -190,7 +200,7 @@ function exhibit_builder_link_to_previous_page($text = null, $props = array(), $
             $props['class'] = 'previous-page';
         }
         if ($text === null) {
-            $text = '&larr; ' . metadata($previousPage, 'menu_title');
+            $text = metadata($previousPage, 'title');
         }
         return exhibit_builder_link_to_exhibit($exhibit, $text, $props, $previousPage);
     }
@@ -311,12 +321,18 @@ function exhibit_builder_page_summary($exhibitPage = null)
         $exhibitPage = get_current_record('exhibit_page');
     }
 
-    $html = '<li>'
-          . '<a href="' . exhibit_builder_exhibit_uri(get_current_record('exhibit'), $exhibitPage) . '">'
-          . metadata($exhibitPage, 'menu_title') .'</a>';
+    $html = '<li class="page">'
+        . '<a class="link" href="' . exhibit_builder_exhibit_uri(get_current_record('exhibit'), $exhibitPage) . '">'
+        . '<p class="title">' . metadata($exhibitPage, 'title') . '</p>';
 
+    if(property_exists($exhibitPage, 'author') && metadata($exhibitPage, 'author') != "0" && trim(metadata($exhibitPage, 'author') != "")) {
+        $html .= '<p class="author">by ' . metadata('exhibitPage', 'author') . '</p>';
+    }
+
+    $html .= '</a>';
     $children = $exhibitPage->getChildPages();
-    if ($children) {
+
+    if ($children && $sublist) {
         $html .= '<ul>';
         foreach ($children as $child) {
             $html .= exhibit_builder_page_summary($child);

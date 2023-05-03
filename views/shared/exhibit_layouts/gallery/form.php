@@ -18,6 +18,15 @@ $options = $block->getOptions();
         <div class="drawer-toggle"></div>
     </div>
 
+    <div class="separator">
+        <?php echo $this->formLabel($formStem . '[options][separator]', __('Block separator')); ?>
+        <?php
+        echo $this->formSelect($formStem . '[options][separator]',
+            @$options['separator'], array(),
+            array('yes' => __('Print'), 'no' => __('Don\'t print')));
+        ?>
+    </div>
+
     <div class="showcase-position">
         <?php echo $this->formLabel($formStem . '[options][showcase-position]', __('Showcase file position')); ?>
         <?php

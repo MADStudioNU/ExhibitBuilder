@@ -13,73 +13,87 @@ echo head(array('title'=> $title, 'bodyclass'=>'exhibits'));
     <input type='hidden' name='record_last_modified' value='<?php echo $exhibit_page->modified; ?>'></input>
     <?php endif; ?>
     <div class="seven columns alpha">
-    <fieldset>
-        <div class="field">
-            <div class="two columns alpha">
-            <?php echo $this->formLabel('title', __('Page Title')); ?>
-            </div>
-            <div class="inputs five columns omega">
-            <?php echo $this->formText('title', $exhibit_page->title); ?>
-            </div>
-        </div>
-        <div class="field">
-            <div class="two columns alpha">
-            <?php echo $this->formLabel('short_title', __('Menu Link Title')); ?>
-            </div>
-            <div class="inputs five columns omega">
-            <p class="explanation"><?php echo __('Optionally use a shorter title in the exhibit menu'); ?></p>
-            <?php echo $this->formText('short_title', $exhibit_page->short_title); ?>
-            </div>
-        </div>
-        <div class="field">
-            <div class="two columns alpha">
-                <?php echo $this->formLabel('slug', __('Page Slug')); ?>
-            </div>
-            <div class="inputs five columns omega">
-                <p class="explanation"><?php echo __('No spaces or special characters allowed'); ?></p>
-                <?php echo $this->formText('slug', $exhibit_page->slug); ?>
-            </div>
-        </div>
-    </fieldset>
-    <fieldset id="block-container">
-        <h2><?php echo __('Content'); ?></h2>
-        <div class="expand-collapse">
-        <button type="button" class="small button expand"><?php echo __('Expand All'); ?></button>
-        <button type="button" class="small button collapse"><?php echo __('Collapse All'); ?></button>
-        </div>
-        <p class="instructions"><?php echo __('To reorder blocks and items, click and drag them to the preferred location.'); ?></p>
-        <?php
-        foreach ($exhibit_page->getPageBlocks() as $index => $block):
-            $block->order = $index + 1;
-            echo $this->partial('exhibits/block-form.php', array('block' => $block));
-        endforeach;
-        ?>
-        <div class="add-block">
-            <h2><?php echo __('New Block'); ?></h2>
-            <div class="layout-select">
-                <h3><?php echo __('Select layout'); ?></h3>
-                <div class="layout-thumbs">
-                <?php
-                    $layouts = ExhibitLayout::getLayouts();
-                    foreach ($layouts as $layout) {
-                        $layout_id = html_escape($layout->id);
-                        echo '<div class="layout" id="' . $layout_id . '">';
-                        echo '<img src="' . html_escape($layout->getIconUrl()) . '">';
-                        echo '<span class="layout-name">' . $layout->name . '</span>';
-                        echo '<input type="radio" name="new-block-layout" value="'. $layout_id .'">';
-                        echo '</div>';
-                    }
-                    foreach ($layouts as $layout) {
-                        echo '<div class="'.html_escape($layout->id).' layout-description">';
-                        echo $layout->description;
-                        echo '</div>';
-                    }
-                ?>
-                <a class="add-link big button" href="#"><?php echo __('Add new content block'); ?></a>
+        <fieldset>
+            <div class="field">
+                <div class="two columns alpha">
+                    <?php echo $this->formLabel('title', __('Page Title')); ?>
+                </div>
+                <div class="inputs five columns omega">
+                    <?php echo $this->formText('title', $exhibit_page->title); ?>
                 </div>
             </div>
-        </div>
-    </fieldset>
+            <div class="field">
+                <div class="two columns alpha">
+                    <?php echo $this->formLabel('short_title', __('Menu Link Title')); ?>
+                </div>
+                <div class="inputs five columns omega">
+                    <p class="explanation"><?php echo __('Optionally use a shorter title in the exhibit menu'); ?></p>
+                    <?php echo $this->formText('short_title', $exhibit_page->short_title); ?>
+                </div>
+            </div>
+            <div class="field">
+                <div class="two columns alpha">
+                    <?php echo $this->formLabel('slug', __('Page Slug')); ?>
+                </div>
+                <div class="inputs five columns omega">
+                    <p class="explanation"><?php echo __('No spaces or special characters allowed'); ?></p>
+                    <?php echo $this->formText('slug', $exhibit_page->slug); ?>
+                </div>
+            </div>
+            <div class="field">
+                <div class="two columns alpha">
+                    <?php echo $this->formLabel('author', __('Page Author')); ?>
+                </div>
+                <div class="inputs five columns omega">
+                    <?php
+                    if(metadata($exhibit_page, 'author') != '0') {
+                        echo $this->formText( 'author', $exhibit_page->author );
+                    } else {
+                        echo $this->formText( 'author', '');
+                    }
+                    ?>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset id="block-container">
+            <h2><?php echo __('Content'); ?></h2>
+            <div class="expand-collapse">
+                <button type="button" class="small button expand"><?php echo __('Expand All'); ?></button>
+                <button type="button" class="small button collapse"><?php echo __('Collapse All'); ?></button>
+            </div>
+            <p class="instructions"><?php echo __('To reorder blocks and items, click and drag them to the preferred location.'); ?></p>
+            <?php
+            foreach ($exhibit_page->getPageBlocks() as $index => $block):
+                $block->order = $index + 1;
+                echo $this->partial('exhibits/block-form.php', array('block' => $block));
+            endforeach;
+            ?>
+            <div class="add-block">
+                <h2><?php echo __('New Block'); ?></h2>
+                <div class="layout-select">
+                    <h4><?php echo __('Select layout'); ?></h4>
+                    <div class="layout-thumbs">
+                        <?php
+                        $layouts = ExhibitLayout::getLayouts();
+                        foreach ($layouts as $layout) {
+                            $layout_id = html_escape($layout->id);
+                            echo '<div class="layout" id="' . $layout_id . '">';
+                            echo '<img src="' . html_escape($layout->getIconUrl()) . '">';
+                            echo '<span class="layout-name">' . $layout->name . '</span>';
+                            echo '<input type="radio" name="new-block-layout" value="'. $layout_id .'">';
+                            echo '</div>';
+                        }
+                        foreach ($layouts as $layout) {
+                            echo '<div class="'.html_escape($layout->id).' layout-description">';
+                            echo $layout->description;
+                            echo '</div>';
+                        }
+                        ?>
+                        <a class="add-link big button" href="#"><?php echo __('Add new content block'); ?></a>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
     </div>
     <?php echo $csrf; ?>
     <div class="three columns omega">
@@ -100,11 +114,11 @@ echo head(array('title'=> $title, 'bodyclass'=>'exhibits'));
             <button type="button" class="search-toggle hide-form blue" aria-label="<?php echo __('Hide Search Form'); ?>" title="<?php echo __('Hide Search Form'); ?>"></button>
         </div>
         <div id="page-search-form" class="container-twelve">
-        <?php
+            <?php
             $action = url(array('module' => 'exhibit-builder',
                 'controller' => 'items', 'action' => 'browse'), 'default', array(), true);
             echo items_search_form(array('id' => 'search'), $action);
-        ?>
+            ?>
         </div>
         <div id="item-select"></div>
     </div>
@@ -112,10 +126,16 @@ echo head(array('title'=> $title, 'bodyclass'=>'exhibits'));
         <button type="button" id="change-selected-item"><?php echo __('Change Selected Item'); ?></button>
         <div class="options">
             <div id="attachment-item-options"></div>
+            <div class="item-media-start-from">
+                <p class="direction"><?php echo __('If desired, provide a starting index number. For PDFs, this is the desired starting page number. For HTML5 media (audio or video), this is the time from the beginning, in seconds, from where the playback should begin.'); ?></p>
+                <div class="inputs">
+                    <?php echo $this->formTextarea('media_start_from', '', array('id' => 'attachment-media-start-from')); ?>
+                </div>
+            </div>
             <div class="item-caption">
                 <p class="direction"><?php echo __('Provide a caption.'); ?></p>
                 <div class="inputs">
-                    <?php echo $this->formTextarea('caption', '', array('rows' => 3, 'id' => 'attachment-caption')); ?>
+                    <?php echo $this->formTextarea('caption', '', array('id' => 'attachment-caption')); ?>
                 </div>
             </div>
         </div>
@@ -126,31 +146,31 @@ echo head(array('title'=> $title, 'bodyclass'=>'exhibits'));
     <div id="attachment-panel-loading"><span class="spinner"></span></div>
 </div>
 <script type="text/javascript">
-jQuery(document).ready(function () {
-    Omeka.ExhibitBuilder.setUpBlocks(<?php echo json_encode(url('exhibits/block-form')); ?>);
-    Omeka.ExhibitBuilder.setUpItemsSelect(<?php echo js_escape(url('exhibits/attachment-item-options')); ?>);
-    Omeka.ExhibitBuilder.setUpAttachments(<?php echo js_escape(url('exhibits/attachment')); ?>, <?php echo js_escape(url('exhibits/attachment-item-options')); ?>);
-    <?php
-    if ($exhibit_page->exists()) {
-        $validateUrl = url(
-            array('action' => 'validate-page', 'id' => $exhibit_page->id),
-            'exhibitStandard', array(), true);
-    } else {
-        $validateUrl = url(
-            array('action' => 'validate-page', 'exhibit_id' => $exhibit_page->exhibit_id,
-                'parent_id' => $exhibit_page->parent_id),
-            'exhibitAction', array(), true);
-    }
-    ?>
-    Omeka.ExhibitBuilder.setUpPageValidate(<?php echo js_escape($validateUrl); ?>);
+    jQuery(document).ready(function () {
+        Omeka.ExhibitBuilder.setUpBlocks(<?php echo json_encode(url('exhibits/block-form')); ?>);
+        Omeka.ExhibitBuilder.setUpItemsSelect(<?php echo js_escape(url('exhibits/attachment-item-options')); ?>);
+        Omeka.ExhibitBuilder.setUpAttachments(<?php echo js_escape(url('exhibits/attachment')); ?>, <?php echo js_escape(url('exhibits/attachment-item-options')); ?>);
+        <?php
+        if ($exhibit_page->exists()) {
+            $validateUrl = url(
+                array('action' => 'validate-page', 'id' => $exhibit_page->id),
+                'exhibitStandard', array(), true);
+        } else {
+            $validateUrl = url(
+                array('action' => 'validate-page', 'exhibit_id' => $exhibit_page->exhibit_id,
+                    'parent_id' => $exhibit_page->parent_id),
+                'exhibitAction', array(), true);
+        }
+        ?>
+        Omeka.ExhibitBuilder.setUpPageValidate(<?php echo js_escape($validateUrl); ?>);
 
-    Omeka.wysiwyg();
-    jQuery(document).on('exhibit-builder-refresh-wysiwyg', function (event) {
-        // Add tinyMCE to all textareas in the div where the item was attached.
-        jQuery(event.target).find('textarea').each(function () {
-            tinyMCE.EditorManager.execCommand('mceAddEditor', false, this.id);
+        Omeka.wysiwyg();
+        jQuery(document).on('exhibit-builder-refresh-wysiwyg', function (event) {
+            // Add tinyMCE to all textareas in the div where the item was attached.
+            jQuery(event.target).find('textarea').each(function () {
+                tinyMCE.EditorManager.execCommand('mceAddEditor', false, this.id);
+            });
         });
     });
-});
 </script>
 <?php echo foot(); ?>

@@ -41,6 +41,15 @@ class ExhibitBlockAttachment extends Omeka_Record_AbstractRecord
     public $caption;
 
     /**
+     * User-specified number that represents starting point of an attachment "playback".
+     * In case of HTML5 media this will become a second to start the playback from (via native method of mediaelement object)
+     * In case of PDF.js reader this will become a page number to set the viewer to when iframe loads (via URL parameter)
+     *
+     * @var integer
+     */
+    public $media_start_from;
+
+    /**
      * Order of this attachment within the block.
      *
      * @var integer
@@ -102,11 +111,11 @@ class ExhibitBlockAttachment extends Omeka_Record_AbstractRecord
         if (empty($this->block_id) || !is_numeric($this->block_id)) {
             $this->addError('page_id', "Must be associated with an exhibit block.");
         }
-        
+
         if ($this->order === null || !is_numeric($this->order)) {
             $this->addError('order', "Must be ordered within the block.");
         }
-        
+
         if (empty($this->item_id) || !is_numeric($this->item_id)) {
             $this->addError(null, 'item_id field must be a valid foreign key');
         }
@@ -145,6 +154,14 @@ class ExhibitBlockAttachment extends Omeka_Record_AbstractRecord
             $this->caption = $data['caption'];
         } else {
             $this->caption = null;
+        }
+
+        // todo: Not sure what to do here. If not number is entered we need to handle that here or DB will take care of it since we told it to expect an integer with default value of 0
+        if (!empty($data['media_start_from'])) {
+            $this->media_start_from = (int) $data['media_start_from'];
+        } else {
+            // Default pointer should be 0
+            $this->media_start_from = 0;
         }
 
         if (!empty($data['order'])) {

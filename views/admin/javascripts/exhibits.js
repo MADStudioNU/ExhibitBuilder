@@ -54,6 +54,12 @@ Omeka.ExhibitBuilder = {};
                     }
                     tinymce.get('attachment-caption').setContent(data.caption);
                 }
+                if (typeof data.media_start_from !== 'undefined') {
+                    if (!data.media_start_from) {
+                        data.media_start_from = 1;
+                    }
+                    tinymce.get('attachment-media-start-from').setContent(data.media_start_from);
+                }
                 $(options).html(response);
             },
             complete: function() {
@@ -103,7 +109,7 @@ Omeka.ExhibitBuilder = {};
                 });
             }
         });
-        
+
         var blockIndex = $('.block-form').length;
 
         $('.add-link').hide();
@@ -124,7 +130,7 @@ Omeka.ExhibitBuilder = {};
                         .insertBefore('.add-block')
                         .trigger('exhibit-builder-refresh-wysiwyg')
                         .trigger('exhibit-builder-add-block')
-                        ;
+                    ;
                     $('input[name=new-block-layout]').prop('checked', false);
                     $('.selected').removeClass('selected');
                     $('.add-link').hide();
@@ -132,7 +138,7 @@ Omeka.ExhibitBuilder = {};
                 'html'
             );
         });
-        
+
         $('.layout').click(function (event) {
             var layout_id = $(this).attr('id');
             $(this).children('input[type="radio"]').prop('checked', true);
@@ -181,7 +187,7 @@ Omeka.ExhibitBuilder = {};
         if ($('#theme').val() === '') {
             $('.configure-button').hide();
         }
-        
+
         $('#theme').change(function() {
             if ($(this).val() === '') {
                 $('.configure-button').hide();
@@ -189,7 +195,7 @@ Omeka.ExhibitBuilder = {};
                 $('.configure-button').show();
             }
         });
-    }; 
+    };
 
     Omeka.ExhibitBuilder.setUpItemsSelect = function (itemOptionsUrl) {
         /*
@@ -297,22 +303,25 @@ Omeka.ExhibitBuilder = {};
         }
 
         function getAttachmentData(container, hidden) {
-            var item_id, file_id, caption;
+            var item_id, file_id, caption, media_start_from;
 
             if (hidden) {
                 item_id = container.find('input[name*="[item_id]"]').val();
                 file_id = container.find('input[name*="[file_id]"]').val();
                 caption = container.find('input[name*="[caption]"]').val();
+                media_start_from = container.find('input[name*="[media_start_from]"]').val();
             } else {
                 item_id = container.find('input[name="item_id"]').val();
                 file_id = container.find('input[name="file_id"]:checked').val();
                 caption = tinymce.get(container.find('textarea[name="caption"]').attr('id')).getContent();
+                media_start_from = tinymce.get(container.find('textarea[name="media_start_from"]').attr('id')).getContent({format: 'text'});
             }
-            
+
             return {
                 'item_id': item_id,
                 'file_id': file_id,
                 'caption': caption,
+                'media_start_from': media_start_from
             };
         }
 
@@ -323,7 +332,7 @@ Omeka.ExhibitBuilder = {};
 
         var attachmentPanel = $('#attachment-panel');
         Omeka.ExhibitBuilder.createDialog(attachmentPanel);
-        
+
         $('#attachment-item-options').on('click','.file-select .item-file', function(event) {
             $(this).find('input[type="radio"]').prop('checked', true);
             $('.selected').removeClass('selected');
@@ -341,6 +350,7 @@ Omeka.ExhibitBuilder = {};
             targetAttachment(this);
 
             tinymce.get('attachment-caption').setContent('');
+            tinymce.get('attachment-media-start-from').setContent('');
             attachmentPanel
                 .removeClass('editing-attachment')
                 .removeClass('editing-selection')
@@ -399,7 +409,7 @@ Omeka.ExhibitBuilder = {};
             $('#page-list .deleted').each(function () {
                 deletedIds.push($(this).parent().attr('id').match(/_(.*)/)[1]);
             });
-            
+
             $('#pages-hidden').val(listData);
             $('#pages-delete-hidden').val(deletedIds.join(','));
         });
@@ -433,7 +443,7 @@ Omeka.ExhibitBuilder = {};
     Omeka.ExhibitBuilder.setUpCoverImageChooser = function (coverImageChooserUrl, itemOptionsUrl) {
         var coverImagePanel = $('#cover-image-panel');
         var selected_cover_image_id = $('#cover_image_file_id').val();
-        
+
         Omeka.ExhibitBuilder.createDialog(coverImagePanel);
 
         function getCoverImageData(container) {
@@ -585,9 +595,8 @@ Omeka.ExhibitBuilder = {};
             open: function () {
                 function refreshDialog() {
                     panel.dialog('option', {
-                        width: Math.min($(window).width() - 100, 600),
-                        height: Math.min($(window).height() - 100, 500),
-                        position: {my: 'center', at: 'center center+22', of: window}
+                        width: Math.min($(window).width() - 0, 600),
+                        height: Math.min($(window).height() - 0, 500)
                     });
                 }
 
